@@ -53,12 +53,10 @@ export const getAllTours = async (req, res) => {
     // Optional: show after replacing comparison operators
     // Actually, they're already formatted with `$gte`, so this step is no longer needed
     // console.log("Query String for Mongoose:", queryStr);
-
-    
+    let query = Tour.find(JSON.parse(queryStr));
 
     // STEP 5: Execute query with Mongoose
-    let query = Tour.find(JSON.parse(queryStr));
-    
+
     // console.log(req.query.sort);
     if (req.query.sort) {
       const sortBy = req.query.sort.split(",").join(" ");
@@ -75,7 +73,21 @@ export const getAllTours = async (req, res) => {
       query = query.select("-__v");
     }
 
-    
+    //Pagination
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+
+    //page=3&limit=10, 1-10, page 1, 11-20, page 2, 21-30 page 3
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip > numTours) {
+        throw new Error("This page doesn't exist");
+      }
+    }
+
     // STEP 6: Send response
     const tours = await query;
     res.status(200).json({
