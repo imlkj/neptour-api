@@ -1,10 +1,15 @@
 import Tour from "../models/tourModel.js";
 
+export const aliasTopTour = (req, res, next) => {
+  req.query.limit = 5;
+  req.query.sort = "-ratingsAverage,price";
+  req.query.fields = "name,price,ratingsAverage,summary,difficulty";
+
+  next();
+};
+
 export const createTours = async (req, res) => {
   try {
-    // const newTour = new Tour({})
-    // newTour.save();
-
     const newTour = await Tour.create(req.body);
 
     res.status(201).json({
@@ -22,79 +27,75 @@ export const createTours = async (req, res) => {
   }
 };
 
-export const getAllTours = async (req, res) => {
-  try {
-    // STEP 1: Build queryObj from req.query
-    const queryObj = {};
-    // console.log(req.query);
-    Object.entries(req.query).forEach(([key, value]) => {
-      const match = key.match(/^(.+)\[(gte|gt|lte|lt)\]$/);
-      // console.log(match);
-      if (match) {
-        // eslint-disable-next-line no-unused-vars
-        const [_, field, operator] = match;
-        if (!queryObj[field]) queryObj[field] = {};
-        queryObj[field][`$${operator}`] = value;
-      } else {
-        queryObj[key] = value;
-      }
-    });
+class APIFeatures {
+  constructor(query, queryStr) {
+    this.query = query;
+    this.queryStr = queryStr;
+  }
 
-    // STEP 2: Remove fields not meant for filtering
+  filter() {
+    const queryObj = { ...this.queryStr };
+
     const excludeFields = ["page", "sort", "limit", "fields"];
     excludeFields.forEach((el) => delete queryObj[el]);
 
-    // STEP 3: Debug log
-    // console.log("Query Object:", queryObj);
-
-    // STEP 4: Turn into query string for Mongoose (if needed)
+    //Replace operators (gte, gt, lte, lt) with MongoDB style ($gte, etc.)
     let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
-    // Optional: show after replacing comparison operators
-    // Actually, they're already formatted with `$gte`, so this step is no longer needed
-    // console.log("Query String for Mongoose:", queryStr);
-    let query = Tour.find(JSON.parse(queryStr));
+    this.query.find(JSON.parse(queryStr));
 
-    // STEP 5: Execute query with Mongoose
+    return this;
+  }
 
-    // console.log(req.query.sort);
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(",").join(" ");
-      console.log(sortBy);
-      query = query.sort(sortBy);
+  sort() {
+    if (this.queryStr.sort) {
+      const sortBy = this.queryStr.sort.split(",").join(" ");
+      this.query = this.query.sort(sortBy);
     } else {
-      query = query.sort("-createdAt");
+      this.query = this.query.sort("-createdAt");
     }
 
-    if (req.query.fields) {
-      const fields = req.query.fields.split(",").join(" ");
-      query = query.select(fields);
+    return this;
+  }
+
+  limit() {
+    if (this.queryStr.fields) {
+      const fields = this.queryStr.fields.split(",").join(" ");
+      this.query = this.query.select(fields);
     } else {
-      query = query.select("-__v");
+      this.query = this.query.select("-__v");
     }
 
-    //Pagination
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 100;
+    return this;
+  }
+
+  paginate() {
+    const page = parseInt(this.queryStr.page) || 1;
+    const limit = parseInt(this.queryStr.limit) || 100;
     const skip = (page - 1) * limit;
+    this.query = this.query.skip(skip).limit(limit);
 
-    //page=3&limit=10, 1-10, page 1, 11-20, page 2, 21-30 page 3
-    query = query.skip(skip).limit(limit);
+    return this;
+  }
+}
 
-    if (req.query.page) {
-      const numTours = await Tour.countDocuments();
-      if (skip > numTours) {
-        throw new Error("This page doesn't exist");
-      }
-    }
+export const getAllTours = async (req, res) => {
+  try {
+    // Execute query
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limit()
+      .paginate(); 
+    const tours = await features.query;
 
-    // STEP 6: Send response
-    const tours = await query;
+    // Send response
     res.status(200).json({
       status: "success",
       results: tours.length,
       data: {
-        tours: tours,
+        tours,
       },
     });
   } catch (err) {

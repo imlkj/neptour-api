@@ -3,12 +3,9 @@ import * as tourController from "../controllers/tourController.js";
 
 const router = express.Router();
 
-// router.param("id", tourController.checkId);
-
-//Create a checkBody middleware
-//Check if body contains the name and price propterty
-//If not, send back 400 (bad request)
-//Add it to the post handler stack
+router
+  .route("/top-5-cheap")
+  .get(tourController.aliasTopTour, tourController.getAllTours);
 
 router
   .route("/")
