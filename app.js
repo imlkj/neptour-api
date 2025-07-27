@@ -13,7 +13,6 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-
 app.set("query parser", (str) => qs.parse(str));
 app.use(express.json());
 app.use(express.static(`./public`));
