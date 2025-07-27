@@ -59,18 +59,23 @@ export const getTour = async (req, res) => {
   try {
     const tour = await Tour.findById(req.params.id);
 
+    if (!tour) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No tour found with that ID",
+      });
+    }
+
     res.status(200).json({
       status: "success",
-      requestedAt: req.requestTime,
-      results: tour.length,
       data: {
-        tours: tour,
+        tour,
       },
     });
   } catch (err) {
     res.status(404).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
     console.error(err);
   }
@@ -82,6 +87,14 @@ export const updateTour = async (req, res) => {
       new: true,
       runValidators: true,
     });
+
+    if (!tour) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No tour found with that ID",
+      });
+    }
+
     res.status(200).json({
       status: "success",
       data: {
@@ -89,9 +102,10 @@ export const updateTour = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(404).json({
+    // 400 for bad request (e.g., validation error)
+    res.status(400).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
     console.error(err);
   }
@@ -99,17 +113,21 @@ export const updateTour = async (req, res) => {
 
 export const deleteTour = async (req, res) => {
   try {
-    await Tour.findByIdAndDelete(req.params.id, {
-      new: true,
-    });
-    res.status(204).json({
-      status: "success",
-      data: null,
-    });
+    const tour = await Tour.findByIdAndDelete(req.params.id);
+
+    if (!tour) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No tour found with that ID",
+      });
+    }
+
+    // 204 means "No Content", so we don't send any data back.
+    res.status(204).send();
   } catch (err) {
     res.status(404).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
     console.error(err);
   }
@@ -149,7 +167,58 @@ export const getTourStats = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       status: "fail",
-      message: err,
+      message: err.message,
+    });
+    console.error(err);
+  }
+};
+
+export const getMonthlyPlan = async (req, res) => {
+  try {
+    const year = req.params.year * 1; // make sure `req.params != req.query.params` contains just the year (like '2021')
+    const plan = await Tour.aggregate([
+      {
+        $unwind: "$startDates",
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$startDates" }, // id is for month
+          numTours: { $sum: 1 }, //no:_ of tours on particular month
+          tours: { $push: "$name" }, // & on that particular month what were tours
+        },
+      },
+      {
+        $addFields: { month: "$_id" },
+      },
+      {
+        $project: { _id: 0 },
+      },
+      {
+        $sort: { numTours: -1 },
+      },
+      // {
+      //   $limit: 4,
+      // },
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        plan,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: err.message,
     });
     console.error(err);
   }
