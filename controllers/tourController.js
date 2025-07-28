@@ -11,7 +11,10 @@ export const aliasTopTour = (req, res, next) => {
 
 export const createTours = async (req, res) => {
   try {
-    const newTour = await Tour.create(req.body);
+    const newTour = await Tour.create(req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     res.status(201).json({
       status: "success",
@@ -22,7 +25,7 @@ export const createTours = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "fail",
-      message: "Invalid data sent",
+      message: err.message,
     });
     console.error(err);
   }

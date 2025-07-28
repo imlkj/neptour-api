@@ -1,69 +1,81 @@
 import mongoose from "mongoose";
 import slugify from "slugify";
+// import validator from "validator";
 
-const tourSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "A tour must have a name"],
-    unique: true,
-    maxlength: [40, "A tour name must have less or equal then 40 characters"],
-    minlength: [10, "A tour name must have more or equal then 10 characters"]
-  },
-  duration: {
-    type: Number,
-    required: [true, "A tours must have a duration"],
-  },
-  maxGroupSize: {
-    type: Number,
-    required: [true, "A tour must have groupt size"],
-  },
-  difficulty: {
-    type: String,
-    required: [true, "A tour must have difficulty"],
-    enum: {
-      values: ["easy", "medium", "difficult"],
-      message: "Difficulty is either: easy, medium, difficult",
+const tourSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "A tour must have a name"],
+      unique: true,
+      maxlength: [40, "A tour name must have less or equal then 40 characters"],
+      minlength: [10, "A tour name must have more or equal then 10 characters"],
+      // validate: [validator.isAlpha, "Tour name must only contain letters"],
     },
-  },
-  rating: {
-    type: Number,
-    default: 4.5,
-    min: [1, "Rating must be above 1.0"],
-    max: [5, "Rating must be below 5.0"],
-  },
-  ratingsAverage: {
-    type: Number,
-    default: 4.5,
-  },
-  ratingsQuantity: {
-    type: Number,
-    default: 0,
-  },
-  price: {
-    type: Number,
-    required: [true, "A tour must have a price"],
-  },
-  priceDiscount: Number,
-  summary: {
-    type: String,
-    trim: true,
-    required: [true, "A tour must have a description"],
-  },
-  description: {
-    type: String,
-    trim: true,
-  },
-  imageCover: {
-    type: String,
-    required: [true, "A tour must have a couver image"],
-  },
-  images: [String],
-  createAt: {
-    type: Date,
-    default: Date.now(),
-    select: false,
-  },
-  startDates: [Date], 
+    duration: {
+      type: Number,
+      required: [true, "A tours must have a duration"],
+    },
+    maxGroupSize: {
+      type: Number,
+      required: [true, "A tour must have groupt size"],
+    },
+    difficulty: {
+      type: String,
+      required: [true, "A tour must have difficulty"],
+      enum: {
+        values: ["easy", "medium", "difficult"],
+        message: "Difficulty is either: easy, medium, difficult",
+      },
+    },
+    rating: {
+      type: Number,
+      default: 4.5,
+      min: [1, "Rating must be above 1.0"],
+      max: [5, "Rating must be below 5.0"],
+    },
+    ratingsAverage: {
+      type: Number,
+      default: 4.5,
+    },
+    ratingsQuantity: {
+      type: Number,
+      default: 0,
+    },
+    price: {
+      type: Number,
+      required: [true, "A tour must have a price"],
+    },
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function (val) {
+          // NOTE "this" only points to current doc on NEW document creation
+          return val < this.price;
+        },
+        message: "Discount price ({VALUE}) should be below than regular price",
+      },
+    },
+    summary: {
+      type: String,
+      trim: true,
+      required: [true, "A tour must have a description"],
+    },
+    description: {
+      type: String,
+      trim: true,
+    },
+    imageCover: {
+      type: String,
+      required: [true, "A tour must have a couver image"],
+    },
+    images: [String],
+    createAt: {
+      type: Date,
+      default: Date.now(),
+      select: false,
+    },
+    startDates: [Date],
     slug: String,
     secretTour: {
       type: Boolean,
@@ -80,7 +92,7 @@ tourSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
 }); //mongoose method
 
-// NOTE Document Middleware: runs before .save() and .create() validate(), remove(),
+// NOTE Document Middleware: runs before .save() and .create() validate(), remove(), it doesn't work on update()
 tourSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
