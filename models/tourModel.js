@@ -77,6 +77,13 @@ tourSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
+
+//Query Middleware, run this middlware with every find
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } });
+  this.start = Date.now();
+  next();
+});
 const Tour = mongoose.model("Tour", tourSchema);
 
 export default Tour;
