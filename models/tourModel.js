@@ -56,8 +56,11 @@ const tourSchema = new mongoose.Schema({
     select: false,
   },
   startDates: [Date], 
-});
-
+    slug: String,
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
 const Tour = mongoose.model("Tour", tourSchema);
 
 export default Tour;
