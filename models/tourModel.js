@@ -84,6 +84,12 @@ tourSchema.pre(/^find/, function (next) {
   this.start = Date.now();
   next();
 });
+
+//NOTE Aggregation Middleware
+tourSchema.pre("aggregate", function (next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  next();
+});
 const Tour = mongoose.model("Tour", tourSchema);
 
 export default Tour;
