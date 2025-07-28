@@ -90,6 +90,14 @@ tourSchema.pre("aggregate", function (next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
   next();
 });
+
+tourSchema.post("save", function (doc, next) {
+  // console.log(doc);
+  const time = Number(Date.now() - this.start);
+  console.log(`Completion time ${time}`);
+  // Number(Date.now() - this.start);
+  next();
+});
 const Tour = mongoose.model("Tour", tourSchema);
 
 export default Tour;
