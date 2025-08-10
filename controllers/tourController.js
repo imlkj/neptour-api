@@ -1,5 +1,6 @@
 import Tour from "../models/tourModel.js";
 import { APIFeatures } from "../utils/apiFeatures.js";
+import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const aliasTopTour = (req, res, next) => {
@@ -43,14 +44,11 @@ export const getAllTours = asyncHandler(async (req, res) => {
   });
 });
 
-export const getTour = asyncHandler(async (req, res) => {
+export const getTour = asyncHandler(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
 
   if (!tour) {
-    return res.status(404).json({
-      status: "fail",
-      message: "No tour found with that ID",
-    });
+    return next(new AppError("No tour found with that ID", 404));
   }
 
   res.status(200).json({
@@ -68,10 +66,7 @@ export const updateTour = asyncHandler(async (req, res) => {
   });
 
   if (!tour) {
-    return res.status(404).json({
-      status: "fail",
-      message: "No tour found with that ID",
-    });
+    return next(new AppError("No tour found with that ID", 404));
   }
 
   res.status(200).json({
@@ -86,10 +81,7 @@ export const deleteTour = asyncHandler(async (req, res) => {
   const tour = await Tour.findByIdAndDelete(req.params.id);
 
   if (!tour) {
-    return res.status(404).json({
-      status: "fail",
-      message: "No tour found with that ID",
-    });
+    return next(new AppError("No tour found with that ID", 404));
   }
 
   // 204 means "No Content", so we don't send any data back.
