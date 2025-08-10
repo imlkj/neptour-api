@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon server.js",
+    "start:prod": "nodemon start.js",
     "debug": "ndb server.js"
   },
   "keywords": [
