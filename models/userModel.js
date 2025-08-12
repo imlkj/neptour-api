@@ -26,16 +26,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "A user must have password"],
     minLength: [8, "A user must have password of minLenght: 8"],
+    select: false,
+    trim: true,
   },
-  confirmPassword: {
+  passwordConfirm: {
     type: String,
-    required: [true, "A user must have an confirm email of minLength: 8"],
+    required: [true, "Please confirm your password"],
     minLength: 8,
     validate: {
       //NOTE This only works on SAVE or CREATE!
       validator: function (el) {
         return el === this.password;
       },
+      message: "Password do not match!"
     },
   },
 });
@@ -44,7 +47,8 @@ userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
   this.password = await bcrypt.hash(this.password, 12);
-  this.confirmPassword = undefined;
+  this.passwordConfirm = undefined;
+  next();
 });
 
 export const User = mongoose.model("User", userSchema);
