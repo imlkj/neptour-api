@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { User } from "../models/userModel.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,14 +20,15 @@ export const createUser = (req, res) => {
   });
 };
 
-export const getAllUsers = (req, res) => {
+export const getAllUsers = asyncHandler(async (req, res, next) => {
+  const users = await User.find();
   res.status(200).json({
     status: "success",
     data: {
       users: users,
     },
   });
-};
+});
 
 export const getUser = (req, res) => {
   res.status(200).json({
