@@ -1,6 +1,6 @@
 import express from "express";
 import * as userController from "../controllers/userController.js";
-import { login, signUp } from "../controllers/authController.js";
+import { login, protect, signUp } from "../controllers/authController.js";
 
 const router = express.Router();
 // router.param("id", checkId);
@@ -10,7 +10,7 @@ router.post("/login", login);
 
 router
   .route("/")
-  .get(userController.getAllUsers)
+  .get(protect, userController.getAllUsers)
   .post(userController.createUser);
 router
   .route("/:id")

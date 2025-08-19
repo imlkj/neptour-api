@@ -38,7 +38,7 @@ export const login = asyncHandler(async (req, res, next) => {
   }
 
   //Check if user exists && password is correct
-  const user =await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select("+password");
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("Incorrect email or password"), 401);
@@ -50,4 +50,30 @@ export const login = asyncHandler(async (req, res, next) => {
     status: "success",
     token,
   });
+});
+
+export const protect = asyncHandler(async (req, res, next) => {
+  // 1.Getting token and check of it's there
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  if (!token) {
+    next(
+      new AppError("You are not logged in! Please log in to get access.", 401),
+    );
+  }
+  //TODO
+  // 2.Verification token
+  
+
+  
+
+  // 3.Check if user still exists
+
+  // 4. Check if user changed password after the toekn was issued
 });
