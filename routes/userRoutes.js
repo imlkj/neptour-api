@@ -1,16 +1,19 @@
 import express from "express";
 import * as userController from "../controllers/userController.js";
-import { login, protect, signUp } from "../controllers/authController.js";
+import * as authController from "../controllers/authController.js";
 
 const router = express.Router();
 // router.param("id", checkId);
 
-router.post("/signUp", signUp);
-router.post("/login", login);
+router.post("/signUp", authController.signUp);
+router.post("/login", authController.login);
+
+router.post("/forgotPassword", authController.forgotPassword);
+router.patch("/resetPassword/:token", authController.resetPassword);
 
 router
   .route("/")
-  .get(protect, userController.getAllUsers)
+  .get(authController.protect, userController.getAllUsers)
   .post(userController.createUser);
 router
   .route("/:id")
