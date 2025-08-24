@@ -174,10 +174,32 @@ export const resetPassword = async (req, res, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
 
-  
   //3. Update changedPasswordAt property for the user
 
   //4. Log the user in, send JWT
+  const token = signToken(user._id);
+  res.status(200).json({
+    status: "success",
+    token,
+  });
+};
+
+export const updatePassword = async (req, res, next) => {
+  //1. Get user from collection
+  const user = await User.findById(req.user._id).select("+password");
+
+  //2. Check if POSTED current password is correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError("You current password is wrong", 401));
+  }
+
+  //3. If so, update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+  // user.findByIdAndUpdate wil NOT work as intended!
+
+  //4. Log user in, send JWT
   const token = signToken(user._id);
   res.status(200).json({
     status: "success",
