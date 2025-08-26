@@ -49,6 +49,15 @@ export const getUser = (req, res) => {
   });
 };
 
+export const deleteMe = asyncHandler(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  res.status(204).json({
+    status: "success",
+    data: null,
+  })
+});
+
 export const updateMe = async (req, res, next) => {
   //1. Create error if user POSTs password data
   if (req.body.password || req.body.passwordConfirm) {
