@@ -47,9 +47,19 @@ const userSchema = new mongoose.Schema({
       message: "Password do not match!",
     },
   },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+});
+
+userSchema.pre(/^find/, function () {
+  //this points to the current query
+  this.find({ active: { $ne: false } });
 });
 
 userSchema.pre("save", async function (next) {
@@ -59,7 +69,7 @@ userSchema.pre("save", async function (next) {
   this.passwordConfirm = undefined;
   next();
 });
-  // Update changedPasswordAt property for the user
+// Update changedPasswordAt property for the user
 userSchema.pre("save", function (next) {
   if (!this.isModified("password") || this.isNew) {
     return next();
