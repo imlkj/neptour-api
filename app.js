@@ -7,6 +7,7 @@ import { router as tourRouter } from "./routes/tourRoutes.js";
 import { router as userRouter } from "./routes/userRoutes.js";
 import AppError from "./utils/appError.js";
 import { globalErrorHandler } from "./controllers/errorHandler.js";
+import rateLimit from "express-rate-limit";
 
 export const app = express();
 dotenv.config({ path: "./config.env" });
@@ -14,7 +15,13 @@ dotenv.config({ path: "./config.env" });
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: "Too many requests from this IP, please try again in an hour!",
+});
 
+app.use("/api", limiter);
 app.set("query parser", (str) => qs.parse(str));
 app.use(express.json());
 app.use(express.static(`./public`));
