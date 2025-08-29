@@ -55,9 +55,11 @@ export const globalErrorHandler = (err, req, res, next) => {
 
     if (err.name === "CastError") error = handleCastErrorDB(error);
     if (err.name === "ValidationError") error = handleValidationErrorDB(error);
-    if (err.name === "JsonWEbTokenError") error = handleJwtError();
+    if (err.name === "JsonWebTokenError") error = handleJwtError();
     if (err.name === "TokenExpiredError") error = handleJwtExpiredError();
 
+    // Log error details for debugging
+    console.error("[GlobalErrorHandler]", err);
     prodError(res, error);
   }
 };
