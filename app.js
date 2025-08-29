@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import qs from "qs";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+import ExpressMongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
 
 import { router as tourRouter } from "./routes/tourRoutes.js";
 import { router as userRouter } from "./routes/userRoutes.js";
@@ -33,6 +35,12 @@ app.use("/api", limiter);
 // Body parser, reading data from body into req.body
 app.set("query parser", (str) => qs.parse(str));
 app.use(express.json({ limit: "10kB" }));
+
+// Data sanitization against NoSQL
+app.use(ExpressMongoSanitize());
+
+// Data sanitzation against XSS
+app.use(xss());
 
 // Serving static files
 app.use(express.static(`./public`));
