@@ -58,8 +58,6 @@ export const globalErrorHandler = (err, req, res, next) => {
     if (err.name === "JsonWebTokenError") error = handleJwtError();
     if (err.name === "TokenExpiredError") error = handleJwtExpiredError();
 
-    // Log error details for debugging
-    console.error("[GlobalErrorHandler]", err);
     prodError(res, error);
   }
 };
