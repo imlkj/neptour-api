@@ -12,10 +12,7 @@ export const aliasTopTour = (req, res, next) => {
 };
 
 export const createTours = asyncHandler(async (req, res, next) => {
-  const newTour = await Tour.create(req.body, {
-    new: true,
-    runValidators: true,
-  });
+  const newTour = await Tour.create(req.body);
 
   res.status(201).json({
     status: "success",
@@ -59,7 +56,7 @@ export const getTour = asyncHandler(async (req, res, next) => {
   });
 });
 
-export const updateTour = asyncHandler(async (req, res) => {
+export const updateTour = asyncHandler(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -77,7 +74,7 @@ export const updateTour = asyncHandler(async (req, res) => {
   });
 });
 
-export const deleteTour = asyncHandler(async (req, res) => {
+export const deleteTour = asyncHandler(async (req, res, next) => {
   const tour = await Tour.findByIdAndDelete(req.params.id);
 
   if (!tour) {
