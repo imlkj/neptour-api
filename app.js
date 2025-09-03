@@ -1,11 +1,12 @@
 import express from "express";
 import morgan from "morgan";
+import path from "path";
+import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import qs from "qs";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
-import ExpressMongoSanitize from "express-mongo-sanitize";
-import xss from "xss-clean";
+import { sanitizeInputs } from "./middlewares/sanitize.js";
 import hpp from "hpp";
 
 import { router as tourRouter } from "./routes/tourRoutes.js";
@@ -14,7 +15,13 @@ import AppError from "./utils/appError.js";
 import { globalErrorHandler } from "./controllers/errorHandler.js";
 
 export const app = express();
-dotenv.config({ path: "./config.env" });
+
+// __dirname equivalent in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Always resolve absolute path
+dotenv.config({ path: path.resolve(__dirname, "./config.env") });
 
 // Global Middlewares
 // Set security HTTP header
@@ -37,18 +44,15 @@ app.use("/api", limiter);
 app.set("query parser", (str) => qs.parse(str));
 app.use(express.json({ limit: "10kB" }));
 
-// Data sanitization against NoSQL
-app.use(ExpressMongoSanitize());
-
-// Data sanitzation against XSS
-app.use(xss());
+// Data sanitization against NoSQL and XSS
+app.use(sanitizeInputs);
 
 // Prevent parameter pollution
 app.use(
   hpp({
     whitelist: [
       "duration",
-      "ratingsQunatity",
+      "ratingsQuantity",
       "ratingsAverage",
       "maxGroupSize",
       "difficulty",
@@ -58,12 +62,12 @@ app.use(
 );
 
 // Serving static files
-app.use(express.static(`./public`));
+app.use(express.static(path.resolve(__dirname, "public")));
 
 // Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  // console.log(req.headers);
+  next();
 });
 
 // Routes
