@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import slugify from "slugify";
-// import validator from "validator";
+import { User } from "./userModel.js";
 
 const tourSchema = new mongoose.Schema(
   {
@@ -113,6 +113,12 @@ const tourSchema = new mongoose.Schema(
 tourSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
 }); //mongoose method
+
+tourSchema.pre("save", async function (next) {
+  const guidesPromise = this.guides.map(async (id) => await User.findById(id));
+  this.guides = await Promise.all(guidesPromise);
+  next();
+});
 
 // NOTE Document Middleware: runs before .save() and .create() validate(), remove(), it doesn't work on update()
 tourSchema.pre("save", function (next) {
