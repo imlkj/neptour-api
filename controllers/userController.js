@@ -40,14 +40,18 @@ export const getAllUsers = asyncHandler(async (req, res, next) => {
   });
 });
 
-export const getUser = (req, res) => {
+export const getUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return res.status(404).json({ status: "fail", message: "User not found" });
+  }
+
   res.status(200).json({
     status: "success",
-    data: {
-      user: "<Get user>",
-    },
+    data: { user },
   });
-};
+});
 
 export const deleteMe = asyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
@@ -55,7 +59,7 @@ export const deleteMe = asyncHandler(async (req, res, next) => {
   res.status(204).json({
     status: "success",
     data: null,
-  })
+  });
 });
 
 export const updateMe = async (req, res, next) => {
