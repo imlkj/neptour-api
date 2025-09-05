@@ -14,6 +14,10 @@ export const getAllReviews = asyncHandler(async (req, res, next) => {
 });
 
 export const createReview = asyncHandler(async (req, res, next) => {
+  // Allow nested routes
+  if (!req.body.tour) req.body.tour = req.params.tourId;
+  if (!req.body.user) req.body.user = req.user.id; //from protect middleware
+  
   const newReview = await Review.create(req.body);
 
   res.status(201).json({
