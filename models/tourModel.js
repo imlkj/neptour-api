@@ -115,9 +115,16 @@ const tourSchema = new mongoose.Schema(
   },
 );
 
+//Virtual Field in Schema
 tourSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
 }); //mongoose method
+
+tourSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "tour",
+  localField: "_id",
+});
 
 // NOTE Document Middleware: runs before .save() and .create() validate(), remove(), it doesn't work on update()
 tourSchema.pre("save", function (next) {
