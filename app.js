@@ -6,11 +6,12 @@ import dotenv from "dotenv";
 import qs from "qs";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
-import { sanitizeInputs } from "./middlewares/sanitize.js";
 import hpp from "hpp";
 
+import { sanitizeInputs } from "./middlewares/sanitize.js";
 import { router as tourRouter } from "./routes/tourRoutes.js";
 import { router as userRouter } from "./routes/userRoutes.js";
+import { router as reviewRouter } from "./routes/reviewRoutes.js";
 import AppError from "./utils/appError.js";
 import { globalErrorHandler } from "./controllers/errorHandler.js";
 
@@ -73,6 +74,7 @@ app.use((req, res, next) => {
 // Routes
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/reviews", reviewRouter);
 
 //NOTE use regex here
 app.all(/.*/, (req, res, next) => {
