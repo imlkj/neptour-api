@@ -1,10 +1,10 @@
 import express from "express";
 import * as tourController from "../controllers/tourController.js";
 import * as authController from "../controllers/authController.js";
-import * as reviewController from "../controllers/reviewController.js";
+import { router as reviewRouter } from "./reviewRoutes.js";
 
 const router = express.Router();
-
+router.use("/:tourId/reviews", reviewRouter);
 router
   .route("/top-5-cheap")
   .get(tourController.aliasTopTour, tourController.getAllTours);
@@ -25,14 +25,6 @@ router
     authController.protect,
     authController.restrictTo("admin"),
     tourController.deleteTour,
-  );
-
-router
-  .route("/:tourId/reviews")
-  .post(
-    authController.protect,
-    authController.restrictTo("user"),
-    reviewController.createReview,
-  );
-
+);
+  
 export { router };
