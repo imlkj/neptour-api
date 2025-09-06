@@ -1,7 +1,7 @@
 import Tour from "../models/tourModel.js";
 import { APIFeatures } from "../utils/apiFeatures.js";
-import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import * as factory from "./factoryHandler.js";
 
 export const aliasTopTour = (req, res, next) => {
   req.query.limit = 5;
@@ -11,16 +11,10 @@ export const aliasTopTour = (req, res, next) => {
   next();
 };
 
-export const createTours = asyncHandler(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
-
-  res.status(201).json({
-    status: "success",
-    data: {
-      tour: newTour,
-    },
-  });
-});
+export const createTours = factory.createOne(Tour);
+export const updateTour = factory.updateOne(Tour);
+export const deleteTour = factory.deleteOne(Tour);
+export const getTour = factory.getOne(Tour, "reviews");
 
 export const getAllTours = asyncHandler(async (req, res) => {
   // Execute query
@@ -39,50 +33,6 @@ export const getAllTours = asyncHandler(async (req, res) => {
       tours,
     },
   });
-});
-
-export const getTour = asyncHandler(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate("reviews");
-
-  if (!tour) {
-    return next(new AppError("No tour found with that ID", 404));
-  }
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour,
-    },
-  });
-});
-
-export const updateTour = asyncHandler(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!tour) {
-    return next(new AppError("No tour found with that ID", 404));
-  }
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour,
-    },
-  });
-});
-
-export const deleteTour = asyncHandler(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-
-  if (!tour) {
-    return next(new AppError("No tour found with that ID", 404));
-  }
-
-  // 204 means "No Content", so we don't send any data back.
-  res.status(204).send();
 });
 
 export const getTourStats = asyncHandler(async (req, res) => {
