@@ -25,7 +25,7 @@ const filterObj = (obj, ...allowedFields) => {
 export const createUser = (req, res) => {
   res.status(201).json({
     status: "error",
-    message: "This route is not defined! Please use signUp instead"
+    message: "This route is not defined! Please use signUp instead",
   });
 };
 
@@ -40,6 +40,11 @@ export const getAllUsers = asyncHandler(async (req, res, next) => {
 });
 
 export const getUser = factory.getOne(User);
+
+export const getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next()
+};
 
 export const deleteMe = asyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
