@@ -4,6 +4,8 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import Tour from "../../models/tourModel.js";
+import { Review } from "../../models/reviewModel.js";
+import { User } from "../../models/userModel.js";
 
 // __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -27,10 +29,18 @@ mongoose
 const tours = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, "../data/tours.json"), "utf-8"),
 );
+const users = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, "../data/users.json"), "utf-8"),
+);
+const reviews = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, "../data/reviews.json"), "utf-8"),
+);
 
 const importData = async () => {
   try {
     await Tour.create(tours);
+    await User.create(users, { validateBeforeSave: false });
+    await Review.create(reviews);
     console.log("Data successfully loaded");
   } catch (err) {
     console.error(err);
@@ -40,6 +50,8 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Tour.deleteMany();
+    await User.deleteMany();
+    await Review.deleteMany();
     console.log("Data deleted successful");
   } catch (err) {
     console.error(err);
