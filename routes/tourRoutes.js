@@ -11,8 +11,12 @@ router
 
 router
   .route("/")
-  .get(authController.protect, tourController.getAllTours)
-  .post(tourController.createTours);
+  .get(tourController.getAllTours)
+  .post(
+    authController.protect,
+    authController.restrictTo("admin", "lead-guide"),
+    tourController.createTours,
+  );
 
 router.route("/tour-stats").get(tourController.getTourStats);
 router.route("/monthly-plan/:year").get(tourController.getMonthlyPlan);
@@ -20,11 +24,15 @@ router.route("/monthly-plan/:year").get(tourController.getMonthlyPlan);
 router
   .route("/:id")
   .get(tourController.getTour)
-  .patch(tourController.updateTour)
+  .patch(
+    authController.protect,
+    authController.restrictTo("admin", "lead-guide"),
+    tourController.updateTour,
+  )
   .delete(
     authController.protect,
-    authController.restrictTo("admin"),
+    authController.restrictTo("admin", "lead-guide"),
     tourController.deleteTour,
-);
-  
+  );
+
 export { router };
