@@ -159,9 +159,22 @@ tourSchema.pre(/^find/, function (next) {
 
 //NOTE Aggregation Middleware
 tourSchema.pre("aggregate", function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  // allow callers to skip this filter via .option({ _disableSecretFilter: true })
+  if (this.options && this.options._disableSecretFilter) return next();
+
+  const pipeline = this.pipeline();
+  const matchStage = { $match: { secretTour: { $ne: true } } };
+
+  // If pipeline starts with $geoNear, insert after it
+  if (pipeline.length && pipeline[0].$geoNear) {
+    pipeline.splice(1, 0, matchStage); // insert at index 1
+  } else {
+    pipeline.unshift(matchStage); // default: place at front
+  }
+
   next();
 });
+
 
 tourSchema.post("save", function (doc, next) {
   // console.log(doc);
