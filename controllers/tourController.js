@@ -1,5 +1,6 @@
 import Tour from "../models/tourModel.js";
 import { APIFeatures } from "../utils/apiFeatures.js";
+import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import * as factory from "./factoryHandler.js";
 
@@ -109,3 +110,34 @@ export const getMonthlyPlan = asyncHandler(async (req, res) => {
     },
   });
 });
+
+// /tours-within/235/center/34.111745,-118.113491/unit/km
+
+export const getToursWithin = async (req, res, next) => {
+  const { distance, latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(",");
+  const radius = unit === "mi" ? distance / 3963.2 : distance / 6378.1;
+
+  if (!lat || !lng) {
+    next(
+      new AppError(
+        "Please provide latitude and longtitute in the formant lat, lng",
+        400,
+      ),
+    );
+  }
+
+  const tours = await Tour.find({
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
+  });
+
+  console.log(distance, lat, lng, unit);
+
+  res.status(200).json({
+    status: "success",
+    results: tours.length,
+    data: {
+      data: tours,
+    },
+  });
+};
