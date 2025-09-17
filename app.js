@@ -14,6 +14,7 @@ import { router as userRouter } from "./routes/userRoutes.js";
 import { router as reviewRouter } from "./routes/reviewRoutes.js";
 import AppError from "./utils/appError.js";
 import { globalErrorHandler } from "./controllers/errorHandler.js";
+import { router as viewRouter } from "./routes/viewRotues.js";
 
 export const app = express();
 
@@ -76,9 +77,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.get("/", (req, res) => {
-  res.status(200).render("base");
-});
+app.use("/", viewRouter);
 
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
