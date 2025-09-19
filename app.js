@@ -34,7 +34,30 @@ dotenv.config({ path: path.resolve(__dirname, "./config.env") });
 app.use(express.static(path.resolve(__dirname, "public")));
 
 // Set security HTTP header
-app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    useDefaults: true,
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: [
+        "'self'",
+        "https://fonts.gstatic.com", // required for the font files
+      ],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "https://a.tile.openstreetmap.org",
+        "https://b.tile.openstreetmap.org",
+        "https://c.tile.openstreetmap.org",
+      ],
+      connectSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'self'"],
+    },
+  }),
+);
 
 // Development logging
 if (process.env.NODE_ENV === "development") {
