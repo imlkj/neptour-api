@@ -7,6 +7,7 @@ import qs from "qs";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import hpp from "hpp";
+import cookieParser from "cookie-parser";
 
 import { sanitizeInputs } from "./middlewares/sanitize.js";
 import { router as tourRouter } from "./routes/tourRoutes.js";
@@ -52,7 +53,7 @@ app.use(
         "https://b.tile.openstreetmap.org",
         "https://c.tile.openstreetmap.org",
       ],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", "http://127.0.0.1:3000"],
       objectSrc: ["'none'"],
       frameAncestors: ["'self'"],
     },
@@ -75,6 +76,8 @@ app.use("/api", limiter);
 // Body parser, reading data from body into req.body
 app.set("query parser", (str) => qs.parse(str));
 app.use(express.json({ limit: "10kB" }));
+app.use(cookieParser());
+
 
 // Data sanitization against NoSQL and XSS
 app.use(sanitizeInputs);
@@ -97,6 +100,7 @@ app.use(
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
+  console.log(req.cookies);
 });
 
 // Routes

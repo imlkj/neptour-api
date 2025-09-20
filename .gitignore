@@ -6,3 +6,4 @@ logs/
 *.log
 .vscode
 config.env
+.parcel-cache/

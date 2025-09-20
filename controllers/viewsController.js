@@ -13,7 +13,7 @@ export const getOverview = asyncHandler(async (req, res) => {
   });
 });
 
-export const getTour = asyncHandler(async (req, res) => {
+export const getTour = asyncHandler(async (req, res, next) => {
   //1. Get the data, for the requested tour (including reviews and guides)
   const tour = await Tour.findOne({ slug: req.params.slug }).populate({
     path: "reviews",
@@ -29,3 +29,9 @@ export const getTour = asyncHandler(async (req, res) => {
     tour,
   });
 });
+
+export const getLoginForm = (req, res) => {
+  res.status(200).render("login", {
+    title: "Log into your account",
+  })
+};
