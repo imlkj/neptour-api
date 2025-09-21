@@ -1,9 +1,7 @@
 /* eslint-disable */
 
-// Read locations from Pug data attribute
-const locations = JSON.parse(document.getElementById("map").dataset.locations);
-
-// Center map roughly on first location
+export const displayMap =(locations) => {
+  // Center map roughly on first location
 const [lng, lat] = locations[0].coordinates;
 const map = L.map("map", { scrollWheelZoom: false }).setView([lat, lng], 8);
 
@@ -30,4 +28,6 @@ locations.forEach((loc) => {
 });
 
 // Auto-fit map to show all points
-if (bounds.length) map.fitBounds(bounds, { padding: [50, 50] });
+  if (bounds.length) map.fitBounds(bounds, { padding: [50, 50] });
+  
+}

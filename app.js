@@ -100,7 +100,7 @@ app.use(
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
-  console.log(req.cookies);
+  // console.log(req.cookies);
 });
 
 // Routes
