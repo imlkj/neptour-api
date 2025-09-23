@@ -1,7 +1,7 @@
 /* eslint-disable */
 import "core-js/stable";
 import "regenerator-runtime/runtime";
-import { login } from "./login.js";
+import { login, logout } from "./login.js";
 import { displayMap } from "./map.js";
 
 const mapElement = document.getElementById("map");
@@ -22,4 +22,10 @@ if (loginForm) {
 
     login(email, password);
   });
+}
+
+const logoutBtn = document.querySelector(".nav__el--logout");
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", logout);
 }

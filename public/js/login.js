@@ -9,21 +9,45 @@ export const login = async (email, password) => {
       body: JSON.stringify({ email, password }),
     });
 
-    let data;
-    try {
-      data = await res.json(); // try parse JSON
-    } catch {
-      data = { message: await res.text() }; // fallback to plain text
-    }
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      throw new Error(data.message || "Login failed");
+      console.log("loging err response: ", data);
+      throw new Error(data.message || "Invalid email or password");
     }
 
     showAlert("success", "Logged in successfully!");
     window.setTimeout(() => location.assign("/"), 1500);
   } catch (err) {
-    console.log(err);
+    console.error("Login error:", err);
     showAlert("error", err.message || "Something went wrong!");
+  }
+};
+
+export const logout = async () => {
+  try {
+    const res = await fetch("http://127.0.0.1:3000/api/v1/users/logout", {
+      method: "GET",
+      credentials: "include", // ensures cookies/session are sent
+    });
+
+    let errorData = {};
+    try {
+      errorData = await res.json();
+    } catch (e) {}
+
+    if (!res.ok) {
+      console.error("Logout error:", errorData);
+      showAlert("error", errorData.message || "Logout request failed");
+      return;
+    }
+
+    showAlert("success", "Logged out successfully!");
+    setTimeout(() => {
+      window.location.assign("/");
+    }, 1000);
+  } catch (err) {
+    console.error("Logout exception:", err);
+    showAlert("error", "Error logging out! Try again.");
   }
 };
