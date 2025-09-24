@@ -17,31 +17,56 @@ const handleJwtError = () =>
 const handleJwtExpiredError = () =>
   new AppError("Your token has expired! Please login again.", 401);
 
-const devError = (res, err) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    error: err,
-    stack: err.stack,
+const devError = (err, req, res) => {
+  //API
+  if (req.originalUrl.startsWith("/api")) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+      error: err,
+      stack: err.stack,
+    });
+  }
+  // Rendered Website
+  return res.status(err.statusCode).render("error", {
+    title: "Something went wrong!",
+    msg: err.message,
   });
 };
 
-const prodError = (res, err) => {
+const prodError = (err, req, res) => {
   //Operational, trusted error: send message to client
-  if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-    });
+  if (req.originalUrl.startsWith("/api")) {
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      });
 
-    //Programming or other unknown error: don't leak error details
-  } else {
+      //Programming or other unknown error: don't leak error details
+    }
     console.error("ERROR 💥", err);
-    res.status(500).json({
+
+    return res.status(500).json({
       status: "error",
       message: "Something went wrong",
     });
   }
+
+  //RENDERED
+  if (err.isOperational) {
+    return res.status(err.statusCode).render("error", {
+      title: "Something went wrong!",
+      msg: err.message,
+    });
+
+    //Programming or other unknown error: don't leak error details
+  }
+  console.error("ERROR 💥", err);
+  return res.status(err.statusCode).render("error", {
+    title: "Something went wrong!",
+    msg: "Please try again later.",
+  });
 };
 
 export const globalErrorHandler = (err, req, res, next) => {
@@ -52,12 +77,13 @@ export const globalErrorHandler = (err, req, res, next) => {
     devError(res, err);
   } else if (process.env.NODE_ENV === "production") {
     let error = { ...err };
+    error.message = err.message;
 
     if (err.name === "CastError") error = handleCastErrorDB(error);
     if (err.name === "ValidationError") error = handleValidationErrorDB(error);
     if (err.name === "JsonWebTokenError") error = handleJwtError();
     if (err.name === "TokenExpiredError") error = handleJwtExpiredError();
 
-    prodError(res, error);
+    prodError(err, req, res);
   }
 };

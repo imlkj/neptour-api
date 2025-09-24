@@ -1,4 +1,5 @@
 import Tour from "../models/tourModel.js";
+import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const getOverview = asyncHandler(async (req, res) => {
@@ -20,6 +21,10 @@ export const getTour = asyncHandler(async (req, res, next) => {
     fields: "review rating user",
   });
 
+  if (!tour) {
+    return next(new AppError("There is no tour with that name.", 400));
+  }
+
   //2. Build template
 
   //3. Render template using data from 1.
@@ -28,10 +33,11 @@ export const getTour = asyncHandler(async (req, res, next) => {
     title: `${tour.name}`,
     tour,
   });
+  next();
 });
 
 export const getLoginForm = (req, res) => {
   res.status(200).render("login", {
     title: "Log into your account",
-  })
+  });
 };
