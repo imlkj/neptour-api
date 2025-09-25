@@ -76,6 +76,8 @@ export const logout = (req, res) => {
 };
 
 export const protect = asyncHandler(async (req, res, next) => {
+  console.log("Protect middleware triggered");
+  console.log("req.cookies.jwt:", req.cookies.jwt);
   // 1.Getting token and check if it's there
   let token;
   if (
@@ -116,6 +118,7 @@ export const protect = asyncHandler(async (req, res, next) => {
   }
 
   req.user = currentUser;
+  res.locals.user = currentUser;
   next();
 });
 

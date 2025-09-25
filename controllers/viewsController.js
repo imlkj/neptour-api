@@ -33,11 +33,18 @@ export const getTour = asyncHandler(async (req, res, next) => {
     title: `${tour.name}`,
     tour,
   });
-  next();
 });
 
 export const getLoginForm = (req, res) => {
   res.status(200).render("login", {
     title: "Log into your account",
+  });
+};
+
+export const getAccount = (req, res) => {
+  console.log("getAccount called, user:", req.user);
+  res.status(200).render("account", {
+    title: "Your account",
+    user: req.user,
   });
 };
