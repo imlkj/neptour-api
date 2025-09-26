@@ -1,4 +1,5 @@
 import Tour from "../models/tourModel.js";
+import { User } from "../models/userModel.js";
 import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -42,9 +43,26 @@ export const getLoginForm = (req, res) => {
 };
 
 export const getAccount = (req, res) => {
-  console.log("getAccount called, user:", req.user);
   res.status(200).render("account", {
     title: "Your account",
     user: req.user,
   });
 };
+
+export const updateUserData = asyncHandler(async (req, res, next) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    {
+      name: req.body.name,
+      email: req.body.email,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  res.status(200).render("account", {
+    title: "Your account",
+    user: updatedUser,
+  });
+});
