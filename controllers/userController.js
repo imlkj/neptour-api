@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import multer from "multer";
+
 import { User } from "../models/userModel.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
@@ -8,6 +10,31 @@ import * as factory from "./factoryHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/img/users");
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split("/")[1];
+    cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+  },
+});
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new AppError("Not an image! Please upload only images.", 400), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+export const uploadUserPhoto = upload.single("photo");
 
 // eslint-disable-next-line no-unused-vars
 const users = JSON.parse(
@@ -43,7 +70,7 @@ export const getUser = factory.getOne(User);
 
 export const getMe = (req, res, next) => {
   req.params.id = req.user.id;
-  next()
+  next();
 };
 
 export const deleteMe = asyncHandler(async (req, res, next) => {
@@ -56,6 +83,9 @@ export const deleteMe = asyncHandler(async (req, res, next) => {
 });
 
 export const updateMe = async (req, res, next) => {
+  // console.log(req.file);
+  // console.log(req.body);
+
   //1. Create error if user POSTs password data
   if (req.body.password || req.body.passwordConfirm) {
     return next(
@@ -68,9 +98,14 @@ export const updateMe = async (req, res, next) => {
 
   //*. Filtered out unwanted fields names that are not allowed to be updated
   const filteredBody = filterObj(req.body, "name", "email");
+  if (req.file) filteredBody.photo = req.file.filename;
 
   //2. Update user document
-  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody);
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
+
   res.status(200).json({
     status: "success",
     data: {

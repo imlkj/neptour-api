@@ -18,7 +18,7 @@ router.patch("/updateMyPassword", authController.updatePassword);
 
 router
   .get("/me", userController.getMe, userController.getUser)
-  .patch("/updateMe", userController.updateMe)
+  .patch("/updateMe", userController.uploadUserPhoto, userController.updateMe)
   .delete("/deleteMe", userController.deleteMe);
 
 router.use(authController.restrictTo("admin"));
