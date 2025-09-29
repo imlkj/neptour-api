@@ -4,7 +4,8 @@ import { User } from "../models/userModel.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
 import { promisify } from "util";
-import { sendEmail } from "../utils/emailHandler.js";
+import { Email } from "../utils/emailHandler.js";
+// import { sendEmail } from "../utils/emailHandler.js";
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -44,7 +45,9 @@ export const signUp = asyncHandler(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   });
-
+  const url = `${req.protocol}://${req.get("host")}/me`;
+  console.log(url);
+  await new Email(newUser, url).sendWelcome();
   createSendToken(newUser, 201, res);
 });
 
@@ -177,7 +180,7 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
   const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetUrl}.\nIf you didn't forget your password, please ignore this email!`;
 
   try {
-    await sendEmail({
+    await new Email({
       email: user.email,
       subject: "Your password reset token (valid for 10 min)",
       message,
