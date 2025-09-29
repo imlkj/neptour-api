@@ -1,7 +1,5 @@
 import express from "express";
 import morgan from "morgan";
-import path from "path";
-import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import qs from "qs";
 import rateLimit from "express-rate-limit";
@@ -16,23 +14,20 @@ import { router as reviewRouter } from "./routes/reviewRoutes.js";
 import AppError from "./utils/appError.js";
 import { globalErrorHandler } from "./controllers/errorHandler.js";
 import { router as viewRouter } from "./routes/viewRotues.js";
+import { resolvePath } from "./utils/pathHelper.js";
 
 export const app = express();
 
-// __dirname equivalent in ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 app.set("view engine", "pug");
-app.set("views", path.resolve(__dirname, "./views"));
+app.set("views", resolvePath("./views"));
 
 // Always resolve absolute path
-dotenv.config({ path: path.resolve(__dirname, "./config.env") });
+dotenv.config({ path: resolvePath("./config.env") });
 
 // Global Middlewares
 
 // Serving static files
-app.use(express.static(path.resolve(__dirname, "public")));
+app.use(express.static(resolvePath("public")));
 
 // Set security HTTP header
 app.use(

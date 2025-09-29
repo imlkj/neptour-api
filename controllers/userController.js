@@ -1,6 +1,3 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import multer from "multer";
 import sharp from "sharp";
 
@@ -9,18 +6,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
 import * as factory from "./factoryHandler.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// const multerStorage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "public/img/users");
-//   },
-//   filename: (req, file, cb) => {
-//     const ext = file.mimetype.split("/")[1];
-//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
-//   },
-// });
 
 const multerStorage = multer.memoryStorage();
 
@@ -51,11 +36,6 @@ export const resizeUserPhoto = asyncHandler(async (req, res, next) => {
 
   next();
 });
-
-// eslint-disable-next-line no-unused-vars
-const users = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "../dev-data/data/users.json")),
-);
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -126,15 +106,6 @@ export const updateMe = async (req, res, next) => {
     status: "success",
     data: {
       user: updatedUser,
-    },
-  });
-};
-
-export const updateUser = (req, res) => {
-  res.status(200).json({
-    status: "success",
-    data: {
-      user: "<Update user>", // TODO
     },
   });
 };
