@@ -164,27 +164,22 @@ export const restrictTo = (...roles) => {
 };
 
 export const forgotPassword = asyncHandler(async (req, res, next) => {
-  //1. Get user based on Posted email
+  // 1. Get user based on Posted email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return next(new AppError("There is no user with this email", 404));
   }
 
-  //2. Generate the random reset token
+  // 2. Generate the random reset token
   const resetToken = user.createPasswordResetToken();
+
+  // 3. Save the user with the token and expiry
   await user.save({ validateBeforeSave: false });
 
-  //3. Send it to user's email
-  const resetUrl = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
-
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetUrl}.\nIf you didn't forget your password, please ignore this email!`;
-
+  // 4. Send it to user's email
   try {
-    await new Email({
-      email: user.email,
-      subject: "Your password reset token (valid for 10 min)",
-      message,
-    });
+    const resetUrl = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
+    await new Email(user, resetUrl).sendPasswordReset();
   } catch (err) {
     console.error("Error sending password reset email:", err);
     user.passwordResetToken = undefined;
@@ -205,32 +200,48 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
   });
 });
 
+
 export const resetPassword = asyncHandler(async (req, res, next) => {
-  //1. Get user based on the token
+  // 1. Get user based on the token
   const hashedToken = crypto
     .createHash("sha256")
     .update(req.params.token)
     .digest("hex");
+
 
   const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() },
   });
 
-  //2. If token has not expired, and there is user, set the new password
+  console.log("user found:", user);
+
+  // 2. If token is invalid or expired
   if (!user) {
     return next(new AppError("Token is invalid or has expired", 400));
   }
+
+  // Ensure new passwords provided
+  if (!req.body.password || !req.body.passwordConfirm) {
+    return next(
+      new AppError("Please provide and confirm your new password", 400),
+    );
+  }
+
+  // 3. Set the new password
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
-  await user.save();
 
-  //3. Update changedPasswordAt property for the user
+  console.log("Saving user...");
+  await user.save(); // runs validators + pre-save hooks (hashing, changedPasswordAt)\
 
-  //4. Log the user in, send JWT
+  console.log("User saved, sending token...");
+
+  // 4. Log the user in, send JWT
   createSendToken(user, 200, res);
+  console.log("Response sent");
 });
 
 export const updatePassword = asyncHandler(async (req, res, next) => {

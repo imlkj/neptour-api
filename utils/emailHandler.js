@@ -53,6 +53,13 @@ export class Email {
   }
 
   async sendWelcome() {
-    this.send("elcome", "Welcome to the Natours family!");
+    await this.send("elcome", "Welcome to the Natours family!");
+  }
+
+  async sendPasswordReset() {
+    await this.send(
+      "passwordReset",
+      "Your passrd token (vaild for only 10 minutes) ",
+    );
   }
 }
