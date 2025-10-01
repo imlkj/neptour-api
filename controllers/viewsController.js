@@ -1,5 +1,5 @@
 import Tour from "../models/tourModel.js";
-import { User } from "../models/userModel.js";
+import  User  from "../models/userModel.js";
 import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 

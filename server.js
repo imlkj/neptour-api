@@ -1,5 +1,4 @@
-import { app } from "./app.js";
-import dotenv from "dotenv";
+import app from "./app.js";
 import mongoose from "mongoose";
 
 process.on("uncaughtException", (err) => {
@@ -7,7 +6,6 @@ process.on("uncaughtException", (err) => {
   console.log(err.name, err.message);
   throw err;
 });
-dotenv.config({ path: "./config.env" });
 
 const DB = process.env.DATABASE.replace(
   "<PASSWORD>",

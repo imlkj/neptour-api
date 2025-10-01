@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { User } from "../models/userModel.js";
+import  User  from "../models/userModel.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
 import { promisify } from "util";

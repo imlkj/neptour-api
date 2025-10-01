@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import Tour from "../../models/tourModel.js";
 import { Review } from "../../models/reviewModel.js";
-import { User } from "../../models/userModel.js";
+import  User  from "../../models/userModel.js";
 
 // __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);

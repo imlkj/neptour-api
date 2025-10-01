@@ -1,6 +1,6 @@
+import "./envConfig.js";
 import express from "express";
 import morgan from "morgan";
-import dotenv from "dotenv";
 import qs from "qs";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
@@ -14,15 +14,13 @@ import { router as reviewRouter } from "./routes/reviewRoutes.js";
 import AppError from "./utils/appError.js";
 import { globalErrorHandler } from "./controllers/errorHandler.js";
 import { router as viewRouter } from "./routes/viewRotues.js";
+import { router as bookingRouter } from "./routes/bookingRoutes.js";
 import { resolvePath } from "./utils/pathHelper.js";
 
-export const app = express();
+const app = express();
 
 app.set("view engine", "pug");
 app.set("views", resolvePath("./views"));
-
-// Always resolve absolute path
-dotenv.config({ path: resolvePath("./config.env") });
 
 // Global Middlewares
 
@@ -104,6 +102,7 @@ app.use("/", viewRouter);
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/bookings", bookingRouter);
 
 //NOTE use regex here
 app.all(/.*/, (req, res, next) => {
@@ -111,3 +110,5 @@ app.all(/.*/, (req, res, next) => {
 });
 
 app.use(globalErrorHandler);
+
+export default app;
