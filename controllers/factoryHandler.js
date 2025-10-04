@@ -61,3 +61,16 @@ export const getOne = (Model, populateOptions) =>
       },
     });
   });
+
+export const getAll = (Model) =>
+  asyncHandler(async (req, res, next) => {
+    const docs = await Model.find();
+
+    res.status(200).json({
+      status: "success",
+      results: docs.length,
+      data: {
+        data: docs,
+      },
+    });
+  });

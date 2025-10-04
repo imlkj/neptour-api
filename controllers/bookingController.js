@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import Tour from "../models/tourModel.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import Booking from "../models/bookingModel.js";
+import * as factory from "./factoryHandler.js";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing STRIPE_SECRET_KEY in environment variables");
@@ -59,6 +60,12 @@ export const createBookingCheckout = asyncHandler(async (req, res, next) => {
   if (!tour && !user && !price) return next();
 
   await Booking.create({ tour, user, price });
-  
+
   res.redirect(req.originalUrl.split("?")[0]);
 });
+
+export const createBooking = factory.createOne(Booking);
+export const getBooking = factory.getOne(Booking);
+export const getAllBookings = factory.getAll(Booking);
+export const updateBooking = factory.updateOne(Booking);
+export const deleteBooking = factory.deleteOne(Booking);
