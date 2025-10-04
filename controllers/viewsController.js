@@ -1,5 +1,6 @@
+import Booking from "../models/bookingModel.js";
 import Tour from "../models/tourModel.js";
-import  User  from "../models/userModel.js";
+import User from "../models/userModel.js";
 import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -48,6 +49,22 @@ export const getAccount = (req, res) => {
     user: req.user,
   });
 };
+
+export const getMyTours = asyncHandler(async (req, res, next) => {
+  //1. Find all bookings
+  const bookings = await Booking.find({ user: req.user.id });
+
+  //2. Find tours with the returned IDs
+  const tourIDs = bookings.map((el) => {
+    return el.tour;
+  });
+  const tours = await Tour.find({ _id: { $in: tourIDs } });
+
+  res.status(200).render("overview", {
+    title: "My Tours",
+    tours,
+  });
+});
 
 export const updateUserData = asyncHandler(async (req, res, next) => {
   const updatedUser = await User.findByIdAndUpdate(
