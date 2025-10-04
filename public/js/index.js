@@ -4,12 +4,14 @@ import "regenerator-runtime/runtime";
 import { login, logout } from "./login.js";
 import { displayMap } from "./map.js";
 import { updateSettings } from "./updateSettings.js";
+import { bookTour } from "./stripe.js";
 
 const mapElement = document.getElementById("map");
 const loginForm = document.querySelector(".form--login");
 const logoutBtn = document.querySelector(".nav__el--logout");
 const userDataForm = document.querySelector(".form-user-data");
 const userPasswordForm = document.querySelector(".form-user-password");
+const bookBtn = document.getElementById("book-tour");
 
 if (mapElement) {
   // Read locations from Pug data attribute
@@ -62,4 +64,12 @@ if (userPasswordForm) {
     document.getElementById("password-confirm").value = "";
     document.querySelector(".btn--save-password").textContent = "Save password";
   });
+}
+
+if (bookBtn) {
+  bookBtn.addEventListener("click", e => {
+    e.target.textContent = "Processing..."
+    const  tourId  = e.target.dataset.tourId;
+    bookTour(tourId);
+  })
 }

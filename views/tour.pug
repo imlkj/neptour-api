@@ -1,6 +1,12 @@
 extends base
 include _reviewCard
 
+block append head
+  link(rel="stylesheet" href="/leaflet/leaflet.css")
+  link(rel="stylesheet" href="/css/style.css")
+  script(src="/leaflet/leaflet.js")
+  script(type= "module" src="/js/map.js")
+
 mixin overviewBox(label, text, icon)
   .overview-box__detail
     svg.overview-box__icon
@@ -79,10 +85,6 @@ block content
       .cta__content
         h2.heading-secondary What are you waiting for?
         p.cta__text #{tour.duration} days. 1 adventure. Infinite memories. Make it yours today!
-        button.btn.btn--green.span-all-rows Book tour now!
-  
-block append head
-  link(rel="stylesheet" href="/leaflet/leaflet.css")
-  link(rel="stylesheet" href="/css/style.css")
-  script(src="/leaflet/leaflet.js")
-  script(type= "module" src="/js/map.js")
+
+        if user
+          button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}`) Book tour now!

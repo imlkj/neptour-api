@@ -33,12 +33,9 @@ app.use(
     useDefaults: true,
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://js.stripe.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: [
-        "'self'",
-        "https://fonts.gstatic.com", // required for the font files
-      ],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: [
         "'self'",
         "data:",
@@ -46,7 +43,8 @@ app.use(
         "https://b.tile.openstreetmap.org",
         "https://c.tile.openstreetmap.org",
       ],
-      connectSrc: ["'self'", "http://127.0.0.1:3000"],
+      connectSrc: ["'self'", "http://127.0.0.1:3000", "https://js.stripe.com"],
+      frameSrc: ["'self'", "https://js.stripe.com"], // ✅ Needed for Stripe Checkout
       objectSrc: ["'none'"],
       frameAncestors: ["'self'"],
     },
