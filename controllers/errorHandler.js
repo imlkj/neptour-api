@@ -19,7 +19,7 @@ const handleJwtExpiredError = () =>
 
 const devError = (err, req, res) => {
   //API
-  if (req.originalUrl.startsWith("/api")) {
+  if (req && req.originalUrl && req.originalUrl.startsWith("/api")) {
     return res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
@@ -36,7 +36,7 @@ const devError = (err, req, res) => {
 
 const prodError = (err, req, res) => {
   //Operational, trusted error: send message to client
-  if (req.originalUrl.startsWith("/api")) {
+  if (req && req.originalUrl && req.originalUrl.startsWith("/api")) {
     if (err.isOperational) {
       return res.status(err.statusCode).json({
         status: err.status,
@@ -70,11 +70,19 @@ const prodError = (err, req, res) => {
 };
 
 export const globalErrorHandler = (err, req, res, next) => {
+  console.error("globalErrorHandler called with:", {
+    errExists: !!err,
+    reqExists: !!req,
+    resExists: !!res,
+    errType: err?.constructor?.name,
+    errMessage: err?.message,
+  });
+
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 
   if (process.env.NODE_ENV === "development") {
-    devError(res, err);
+    return devError(err, req, res);
   } else if (process.env.NODE_ENV === "production") {
     let error = { ...err };
     error.message = err.message;
@@ -84,6 +92,6 @@ export const globalErrorHandler = (err, req, res, next) => {
     if (err.name === "JsonWebTokenError") error = handleJwtError();
     if (err.name === "TokenExpiredError") error = handleJwtExpiredError();
 
-    prodError(err, req, res);
+    return prodError(error, req, res);
   }
 };

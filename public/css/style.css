@@ -32,7 +32,6 @@ body {
   font-weight: 300;
   font-family: "Lato", sans-serif;
   color: #777;
-  padding: 3rem;
   min-height: 100vh;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -319,8 +318,8 @@ body {
   .header {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
-    -ms-flex-direction: column;
-    flex-direction: column;
+    /* -ms-flex-direction: column; */
+    /* flex-direction: column; */
   }
 }
 .header__logo img {
@@ -605,7 +604,9 @@ body {
   display: grid;
   grid-column-gap: 6rem;
   grid-auto-flow: column;
-  overflow-x: scroll;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
   -ms-scroll-snap-type: x mandatory;
   scroll-snap-type: x mandatory;
 }
@@ -1322,4 +1323,570 @@ body {
   box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
+}
+
+@media (max-width: 64em) {
+  /* 1024px */
+  .card-container {
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 5rem;
+  }
+}
+
+@media (max-width: 48em) {
+  /* 480px */
+  .card-container {
+    grid-gap: 3rem;
+    padding: 0 1.5rem;
+  }
+
+  .card__details {
+    padding: 2rem;
+  }
+
+  .card__picture {
+    height: 18rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  /* slightly tighter grid for medium desktops */
+  .card-container {
+    grid-gap: 5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Header/footer stack and padding reduction */
+  .header {
+    /* flex-direction: column; */
+    align-items: stretch;
+    padding: 0 2.5rem;
+    /* height: auto; */
+  }
+  .nav--tours,
+  .nav--user {
+    flex: 0 0 auto;
+    justify-content: center;
+    margin-left: auto;
+  }
+  .header__logo {
+    order: -1;
+    margin: 1.5rem 0;
+    display: flex;
+    justify-content: center;
+  }
+  .footer {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .main {
+    padding: 5rem 2.5rem;
+  }
+}
+
+@media (max-width: 800px) {
+  .card-container {
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 4rem;
+    padding: 0 2.5rem;
+  }
+  .cta {
+    padding: 5rem 2.5rem 5rem 10rem;
+  }
+  .login-form {
+    padding: 3.5rem 3rem;
+    max-width: 46rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .nav {
+    flex-direction: column;
+    align-items: center;
+  }
+  .nav__el:not(:last-child) {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+  .card-container {
+    grid-template-columns: 1fr;
+    grid-gap: 3rem;
+    padding: 0 1.5rem;
+  }
+  .card__picture {
+    height: 18rem;
+  }
+  .main {
+    padding: 3.5rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .heading-primary {
+    font-size: 3rem;
+  }
+  .login-form {
+    padding: 2.5rem 1.5rem;
+    max-width: 36rem;
+  }
+  .user-view__menu {
+    display: none;
+  }
+  .user-view__content {
+    padding: 2rem 1rem;
+  }
+}
+
+/* === Reviews responsive: switch from horizontal scroller to stacked/grid layout === */
+@media (max-width: 1000px) {
+  .reviews {
+    /* show as a responsive grid instead of horizontal scroller */
+    display: grid;
+    grid-auto-flow: initial;
+    grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+    grid-column-gap: 3rem;
+    grid-row-gap: 2.5rem;
+    overflow: visible;
+    scroll-snap-type: none;
+    -ms-scroll-snap-type: none;
+    padding: 3.5rem 2rem;
+  }
+
+  .reviews__card {
+    width: auto; /* allow grid to size cards */
+    padding: 3rem;
+    margin: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .reviews {
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 1.5rem;
+    grid-row-gap: 1.5rem;
+    padding: 3rem 1.5rem;
+  }
+
+  .reviews__card {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .reviews {
+    grid-template-columns: 1fr;
+    padding: 2rem 1rem;
+    grid-row-gap: 1rem;
+  }
+
+  .reviews__card {
+    width: 100%;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 1000px) {
+  /* make overlay less tall and reduce its opacity so hero image shows through on tablets */
+  .header__hero {
+    height: 55vw; /* reduce overall hero height */
+  }
+  .header__hero-overlay {
+    opacity: 0.6; /* slightly more transparent */
+    background-image: linear-gradient(
+      to right bottom,
+      rgba(125, 213, 111, 0.6),
+      rgba(40, 180, 135, 0.6)
+    );
+  }
+}
+
+@media (max-width: 600px) {
+  /* mobile: make overlay very subtle and adjust clip/positioning */
+  .header__hero {
+    height: 70vw; /* allow hero to scale taller on very small screens */
+  }
+  .header__hero-overlay {
+    opacity: 0.45; /* let more of the image show through on phones */
+    background-image: linear-gradient(
+      to right bottom,
+      rgba(125, 213, 111, 0.45),
+      rgba(40, 180, 135, 0.45)
+    );
+    background-position: center center;
+  }
+
+  /* ensure hero image crops to a sensible focal point on phones */
+  .header__hero-img {
+    object-fit: cover;
+    object-position: 50% 30%; /* shift focal point upward to show more sky/landscape */
+    height: 100%;
+    width: 100%;
+  }
+}
+
+/* === Overview / section-description responsive tweaks === */
+@media (max-width: 1000px) {
+  /* Tablet: make overview and description sit side-by-side more cleanly or stack if narrow */
+  .section-description {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 3rem;
+  }
+  .section-description > * {
+    flex: 1 1 50%;
+    padding: 0 4vw;
+  }
+  .overview-box {
+    padding-top: 6vw;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Mobile: stack overview and description vertically and center content */
+  .section-description {
+    flex-direction: column;
+    padding: 0 1.5rem;
+  }
+  .section-description > * {
+    flex: 0 0 auto;
+    padding: 2rem 0;
+  }
+  .overview-box {
+    padding: 2.5rem 1rem;
+    text-align: center;
+  }
+  .overview-box__group {
+    margin-bottom: 2.25rem;
+  }
+  .overview-box__detail {
+    justify-content: center;
+  }
+  .overview-box__img {
+    margin: 0 auto 1rem auto;
+  }
+}
+
+/* Enhanced responsive rules for overview-box and description-box */
+@media (max-width: 1000px) {
+  /* Give overview a bit more room on tablets, keep description readable */
+  .section-description {
+    align-items: flex-start;
+  }
+
+  .section-description > * {
+    flex: 0 0 48%;
+    padding: 0 3vw;
+  }
+
+  .overview-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 4vw;
+  }
+
+  .overview-box__group {
+    display: block;
+    margin-bottom: 3rem;
+  }
+
+  .overview-box__detail {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .description-box {
+    padding-top: 6vw;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Stack overview and description on narrower tablets and phones */
+  .section-description {
+    flex-direction: column;
+    padding: 0 1.5rem;
+  }
+
+  .section-description > * {
+    flex: 0 0 auto;
+    width: 100%;
+    padding: 1.5rem 0;
+  }
+
+  .overview-box {
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  .overview-box__group {
+    margin-bottom: 1.75rem;
+  }
+
+  .overview-box__detail {
+    justify-content: center;
+    font-size: 1.4rem;
+  }
+
+  /* group decorative images and center them as a row */
+  .cta__imgs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .cta__img {
+    position: static !important;
+    height: 9.5rem;
+    width: 9.5rem;
+    display: inline-block;
+    margin: 0;
+    -webkit-transform: none !important;
+    transform: none !important;
+  }
+
+  .cta__img--logo,
+  .cta__img--1,
+  .cta__img--2 {
+    position: static !important;
+    -webkit-transform: none !important;
+    transform: none !important;
+  }
+
+  .cta__content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .cta__text {
+    font-size: 1.6rem;
+  }
+
+  .overview-box__label {
+    margin-right: 0;
+  }
+
+  .overview-box__text {
+    font-size: 1.45rem;
+  }
+
+  .description__text {
+    font-size: 1.45rem;
+    line-height: 1.6;
+  }
+}
+
+/* === CTA responsive tweaks === */
+@media (max-width: 1000px) {
+  .cta {
+    padding: 6rem 3.5rem 6rem 10rem;
+  }
+  .cta__img {
+    height: 12rem;
+    width: 12rem;
+  }
+  .cta__img--logo {
+    transform: translate(-30%, -50%);
+  }
+  .cta__content {
+    grid-template-columns: 1fr;
+    grid-auto-flow: row;
+    text-align: left;
+  }
+  .cta__text {
+    font-size: 1.7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .cta {
+    padding: 4rem 2rem;
+  }
+  .cta__img {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    display: block;
+    margin: 0 auto 1.25rem;
+    height: 10rem;
+    width: 10rem;
+    -webkit-transform: none !important;
+    transform: none !important;
+  }
+  .cta__img--logo,
+  .cta__img--1,
+  .cta__img--2 {
+    -webkit-transform: none !important;
+    transform: none !important;
+  }
+  .cta__content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  .cta__text {
+    font-size: 1.6rem;
+  }
+  /* By default on narrow screens hide decorative tour images to keep CTA clean.
+     If you prefer the desktop overlapping look, change `display` to `block` and
+     adjust transforms/positions as needed. */
+  .cta__img--1,
+  .cta__img--2 {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta {
+    padding: 2.5rem 1rem;
+    border-radius: 0.75rem;
+  }
+  .cta__img {
+    height: 8rem;
+    width: 8rem;
+    margin-bottom: 0.75rem;
+  }
+  .cta__content {
+    text-align: center;
+  }
+  .cta__text {
+    font-size: 1.45rem;
+  }
+  .cta__img--1,
+  .cta__img--2 {
+    display: none; /* hide decorative tour images on very small screens */
+  }
+}
+
+/* === Header hero: responsive tweaks for tablet & mobile === */
+@media (max-width: 1000px) {
+  .section-header {
+    /* increase vertical space a bit so heading has room */
+    height: 48vw;
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% calc(100% - var(--section-rotate)),
+      0 100%
+    );
+  }
+
+  .header__hero-img {
+    object-position: 50% 30%;
+  }
+
+  .heading-box {
+    /* anchor heading slightly higher and remove top constraint */
+    top: auto;
+    bottom: 10vw;
+    transform: translate(-50%, 0);
+    padding: 0 2rem;
+    width: 95%;
+  }
+
+  .heading-primary {
+    font-size: 4rem;
+    width: 85%;
+  }
+
+  .heading-box__group {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-header {
+    height: 60vw;
+  }
+
+  .heading-box {
+    bottom: 8vw;
+    padding: 0 1.25rem;
+  }
+
+  .heading-primary {
+    font-size: 3.2rem;
+    width: 92%;
+    text-align: center;
+  }
+
+  .heading-box__group {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .heading-box__detail {
+    font-size: 1.3rem;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-header {
+    height: 75vw;
+  }
+
+  .header__hero-img {
+    object-position: 50% 20%;
+  }
+
+  .heading-box {
+    bottom: 6vw;
+    padding: 0 0.75rem;
+  }
+
+  .heading-primary {
+    font-size: 2.4rem;
+    width: 98%;
+  }
+
+  .heading-box__detail {
+    font-size: 1.1rem;
+  }
+
+  .header__hero-overlay {
+    opacity: 0.4;
+  }
+}
+
+/* Make picture boxes stack and images scale on small devices */
+@media (max-width: 480px) {
+  .section-pictures {
+    clip-path: none;
+    -webkit-clip-path: none;
+    margin-top: 0;
+    padding: 1rem 0 2rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .picture-box {
+    width: 100%;
+    padding: 0;
+    margin: 0 0 1.25rem 0;
+    display: block;
+  }
+
+  .picture-box__img {
+    height: 55vw; /* scale with viewport width */
+    width: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+    display: block;
+    border-radius: 0.5rem;
+  }
+
+  /* remove the variant paddings that offset images on desktop */
+  .picture-box__img--1,
+  .picture-box__img--2,
+  .picture-box__img--3 {
+    padding: 0 !important;
+  }
 }

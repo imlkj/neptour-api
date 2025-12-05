@@ -1,0 +1,12 @@
+services:
+  server:
+    build:
+      context: .
+      target: dev
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - .:/usr/src/app:delegated
+      - /usr/src/app/node_modules
+    ports:
+      - "3000:3000"
